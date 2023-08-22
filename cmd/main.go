@@ -3,14 +3,43 @@ package main
 
 import (
 	"log"
+	"github.com/spf13/viper"
 	"github.com/Algalyq/Go_boilerplate"
 	"github.com/Algalyq/Go_boilerplate/pkg/handler"
+	"github.com/Algalyq/Go_boilerplate/pkg/repository"
+	"github.com/Algalyq/Go_boilerplate/pkg/service"
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.mongodb.org/mongo-driver/mongo/options"
+	"context"
 )
 
-func main(){
-	handler := new(handler.Handler)
-	srv := new(Go_boilerplate.Server)
-	if err := srv.Run("8080", handler.InitRoutes()); err != nil{
+func main() {
+	if err := initConfig(); err != nil {
+		log.Fatal(err.Error())
+	}
+
+	// Connect to MongoDB Atlas
+	clientOptions := options.Client().ApplyURI("mongodb+srv://algalyq:2003720an@cluster0.bosxgra.mongodb.net/?retryWrites=true&w=majority")
+	mongoClient, err := mongo.Connect(context.Background(), clientOptions)
+	if err != nil {
+		log.Fatalf("Failed to connect to MongoDB Atlas: %v", err)
+	}
+	defer mongoClient.Disconnect(context.Background())
+
+	// Create a new MongoDB repository
+	repo := repository.NewRepository(mongoClient)
+	// Create services and handlers as before
+	services := service.NewService(repo)
+	handler := handler.NewHandler(services)
+
+	srv := new(goboilerplate.Server)
+	if err := srv.Run(viper.GetString("port"), handler.InitRoutes()); err != nil {
 		log.Fatalf(err.Error())
 	}
+}
+
+func initConfig() error {
+	viper.AddConfigPath("./configs")
+	viper.SetConfigName("config")
+	return viper.ReadInConfig()
 }
