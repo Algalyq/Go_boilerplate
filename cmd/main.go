@@ -4,7 +4,7 @@ package main
 import (
 	"log"
 	"github.com/spf13/viper"
-	"github.com/Algalyq/Go_boilerplate"
+	"github.com/Algalyq/Go_boilerplate/data"
 	"github.com/Algalyq/Go_boilerplate/pkg/handler"
 	"github.com/Algalyq/Go_boilerplate/pkg/repository"
 	"github.com/Algalyq/Go_boilerplate/pkg/service"
@@ -26,13 +26,11 @@ func main() {
 	}
 	defer mongoClient.Disconnect(context.Background())
 
-	// Create a new MongoDB repository
 	repo := repository.NewRepository(mongoClient)
-	// Create services and handlers as before
 	services := service.NewService(repo)
 	handler := handler.NewHandler(services)
 
-	srv := new(goboilerplate.Server)
+	srv := new(data.Server)
 	if err := srv.Run(viper.GetString("port"), handler.InitRoutes()); err != nil {
 		log.Fatalf(err.Error())
 	}

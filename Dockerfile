@@ -1,17 +1,20 @@
+# Use an official Golang runtime as a parent image
+FROM golang:latest
 
-FROM golang:1.18
+# Set the working directory to /app
+WORKDIR /app
 
-WORKDIR /cmd
+# Copy the current directory contents into the container at /app
+COPY . /app
 
-COPY ./go.mod .
+# Download and install any required dependencies
+RUN go mod download
 
-COPY ./go.sum .
+# Build the Go application
+RUN go build -o main ./cmd
 
-# RUN go run ./cmd/main.go
-RUN go build -o cmd
-
+# Expose port 8080 to the outside world
 EXPOSE 8080
 
-COPY . /cmd/
-
-CMD ["./cmd"]
+# Command to run the executable
+CMD ["./main"]

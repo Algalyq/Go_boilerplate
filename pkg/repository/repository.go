@@ -2,10 +2,13 @@ package repository
 
 import (
     "go.mongodb.org/mongo-driver/mongo"
+	"github.com/Algalyq/Go_boilerplate/data"
 )
 
 
 type Authorization interface {
+	CreateUser(user data.User) (int, error)
+	GetUser(username,password string) (data.User, error) 
 }
 
 type Searching interface {

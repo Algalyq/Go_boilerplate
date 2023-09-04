@@ -1,4 +1,4 @@
-package goboilerplate
+package data
 
 import ("net/http"
 		"time"
